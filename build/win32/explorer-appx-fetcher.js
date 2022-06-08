@@ -23,11 +23,11 @@ async function downloadExplorerAppx(outDir, quality = 'stable', targetArch = 'x6
     d(`downloading ${fileName}`);
     const artifact = await (0, get_1.downloadArtifact)({
         isGeneric: true,
-        version: '1.0.0',
+        version: '1.0.1',
         artifactName: fileName,
         mirrorOptions: {
             mirror: 'https://github.com/microsoft/vscode-explorer-command/releases/download/',
-            customDir: '1.0.0',
+            customDir: '1.0.1',
             customFilename: fileName
         }
     });
