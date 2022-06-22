@@ -6,6 +6,7 @@
 'use strict';
 
 import * as debug from 'debug';
+import * as extract from 'extract-zip';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as product from '../../product.json';
@@ -15,9 +16,9 @@ const d = debug('explorer-appx-fetcher');
 
 export async function downloadExplorerAppx(outDir: string, quality: string = 'stable', targetArch: string = 'x64'): Promise<void> {
 	const fileNamePrefix = quality === 'insider' ? 'code_insiders' : 'code';
-	const fileName = `${fileNamePrefix}_explorer_${targetArch}.appx`;
+	const fileName = `${fileNamePrefix}_explorer_${targetArch}.zip`;
 
-	if (await fs.pathExists(path.resolve(outDir, 'fileName'))) {
+	if (await fs.pathExists(path.resolve(outDir, 'resources.pri'))) {
 		return;
 	}
 
@@ -28,16 +29,18 @@ export async function downloadExplorerAppx(outDir: string, quality: string = 'st
 	d(`downloading ${fileName}`);
 	const artifact = await downloadArtifact({
 		isGeneric: true,
-		version: '1.0.1',
+		version: '2.0.0',
 		artifactName: fileName,
+		unsafelyDisableChecksums: true,
 		mirrorOptions: {
 			mirror: 'https://github.com/microsoft/vscode-explorer-command/releases/download/',
-			customDir: '1.0.1',
+			customDir: '2.0.0',
 			customFilename: fileName
 		}
 	});
 
-	await fs.copy(artifact, path.join(outDir, fileName));
+	d(`unpacking from ${fileName}`);
+	await extract(artifact, { dir: outDir });
 }
 
 async function main(): Promise<void> {

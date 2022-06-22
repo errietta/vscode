@@ -336,11 +336,15 @@ function packageTask(platform, arch, sourceFolderName, destinationFolderName, op
 
 			if (quality) {
 				const appxPackagePrefix = quality === 'insider' ? 'code_insiders' : 'code';
+				const appxDLL = `${appxPackagePrefix}_explorer_command.dll`;
+				const resources = 'resources.pri';
 				let appxPackage = `${appxPackagePrefix}_explorer_${arch}.appx`;
 				if (arch === 'ia32') {
 					appxPackage = `${appxPackagePrefix}_explorer_x86.appx`;
 				}
 				result = es.merge(result, gulp.src(`resources/win32/appx/${appxPackage}`, { base: 'resources/win32/appx' }));
+				result = es.merge(result, gulp.src(`resources/win32/appx/${appxDLL}`, { base: 'resources/win32/appx' }));
+				result = es.merge(result, gulp.src(`resources/win32/appx/${resources}`, { base: 'resources/win32/appx' }));
 			}
 		} else if (platform === 'linux') {
 			result = es.merge(result, gulp.src('resources/linux/bin/code.sh', { base: '.' })

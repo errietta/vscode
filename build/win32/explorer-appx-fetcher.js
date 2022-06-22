@@ -6,6 +6,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.downloadExplorerAppx = void 0;
 const debug = require("debug");
+const extract = require("extract-zip");
 const fs = require("fs-extra");
 const path = require("path");
 const product = require("../../product.json");
@@ -13,8 +14,8 @@ const get_1 = require("@electron/get");
 const d = debug('explorer-appx-fetcher');
 async function downloadExplorerAppx(outDir, quality = 'stable', targetArch = 'x64') {
     const fileNamePrefix = quality === 'insider' ? 'code_insiders' : 'code';
-    const fileName = `${fileNamePrefix}_explorer_${targetArch}.appx`;
-    if (await fs.pathExists(path.resolve(outDir, 'fileName'))) {
+    const fileName = `${fileNamePrefix}_explorer_${targetArch}.zip`;
+    if (await fs.pathExists(path.resolve(outDir, 'resources.pri'))) {
         return;
     }
     if (!await fs.pathExists(outDir)) {
@@ -23,15 +24,17 @@ async function downloadExplorerAppx(outDir, quality = 'stable', targetArch = 'x6
     d(`downloading ${fileName}`);
     const artifact = await (0, get_1.downloadArtifact)({
         isGeneric: true,
-        version: '1.0.1',
+        version: '2.0.0',
         artifactName: fileName,
+        unsafelyDisableChecksums: true,
         mirrorOptions: {
             mirror: 'https://github.com/microsoft/vscode-explorer-command/releases/download/',
-            customDir: '1.0.1',
+            customDir: '2.0.0',
             customFilename: fileName
         }
     });
-    await fs.copy(artifact, path.join(outDir, fileName));
+    d(`unpacking from ${fileName}`);
+    await extract(artifact, { dir: outDir });
 }
 exports.downloadExplorerAppx = downloadExplorerAppx;
 async function main() {
